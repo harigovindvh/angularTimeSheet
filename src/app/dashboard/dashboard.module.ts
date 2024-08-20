@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { DashboardRoutingModule } from './dashboard-routing.module';
 import { DashboardComponent } from './dashboard.component';
 import { FormsModule } from '@angular/forms';
-import { NgbTypeahead } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule, NgbTypeahead } from '@ng-bootstrap/ng-bootstrap';
 
 
 @NgModule({
@@ -15,7 +15,8 @@ import { NgbTypeahead } from '@ng-bootstrap/ng-bootstrap';
     CommonModule,
     DashboardRoutingModule,
     FormsModule,
-    NgbTypeahead
+    NgbTypeahead,
+    NgbModule
   ]
 })
 export class DashboardModule { }

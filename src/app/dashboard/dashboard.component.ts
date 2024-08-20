@@ -1,7 +1,15 @@
-import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { catchError, debounceTime, distinctUntilChanged, map, Observable, of, switchMap } from 'rxjs';
-import { Task } from './task.model';
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  Observable,
+  of,
+  switchMap,
+} from 'rxjs';
+
+import { Log, Task } from './dashboard.model';
+import { DashboardService } from './dashboard.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -11,39 +19,77 @@ import { Task } from './task.model';
 export class DashboardComponent {
   start: string = '';
   end: string = '';
-  task: string = '';
-  logs: any[] = [];
+  task: Task = {
+    id: '',
+    createdAt: '',
+    name: '',
+  };
+  logs: Log[] = [];
+  taskList: Task[] = [];
+  selectedTaskId: number | null = null;
 
-  constructor(private http: HttpClient) {}
+  constructor(private _dashboardService: DashboardService) {}
 
   ngOnInit() {
-    this.http
-      .get<any[]>('https://63d74fd85c4274b136f1fda5.mockapi.io/api/v1/log')
-      .subscribe((data) => {
-        this.logs = data;
-      });
+    this.getLogs();
+    this.getTasks();
   }
 
-  onSubmit() {
+  getTasks(): void {
+    this._dashboardService.getTasks().subscribe((data) => {
+      this.taskList = data;
+    });
+  }
+
+  getLogs(): void {
+    this._dashboardService.getLogs().subscribe((data) => {
+      this.logs = data;
+    });
+  }
+
+  filterLogs(): void {
+    if (this.selectedTaskId) {
+      this._dashboardService
+        .filterLogs(this.selectedTaskId)
+        .subscribe((data) => {
+          this.logs = data;
+        });
+    }
+  }
+
+  onSubmit(): void {
     const log = {
       task: this.task,
       start: this.start,
       end: this.end,
     };
 
-    this.http
-      .post('https://63d74fd85c4274b136f1fda5.mockapi.io/api/v1/log', log)
-      .subscribe((response) => {
-        this.logs.push(response);
-      });
+    this._dashboardService.createLog(log).subscribe(
+      (response) => {
+        this.logs.push(response as Log);
+      },
+      (error) => {
+        //should be a notification to the user
+        throw error;
+      }
+    );
   }
 
-  search = (text$: Observable<string>) => text$.pipe(
-    debounceTime(300),
-    distinctUntilChanged(),
-    switchMap(term =>term.length<2 ? of([]) : this.http.get<Task[]>(`https://63d74fd85c4274b136f1fda5.mockapi.io/api/v1/task?name=${term}`).pipe(
-      map(response => response.map(responseItem => responseItem.name) || []),
-      catchError(() => of([]))
-    )
-    ))
+  /**
+   * Helper functions
+   * @param text$ search key
+   * @returns Task list
+   */
+  search = (text$: Observable<string>): Observable<Task[]> =>
+    text$.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap((term) =>
+        term.length < 2
+          ? of([])
+          : this._dashboardService.search(term).pipe(catchError(() => of([])))
+      )
+    );
+
+  formatter = (x: { name: string }) => x.name;
 }

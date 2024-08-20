@@ -7,9 +7,14 @@
     <div class="card-body">
       <form (ngSubmit)="onSubmit()">
         <div class="form-row">
+
+          <ng-template #rt let-r="result" let-t="term">
+            <ngb-highlight [result]="r.name" [term]="t"></ngb-highlight>
+          </ng-template>
           <div class="form-group col-md-4">
             <label for="task">Task</label>
-            <input [ngbTypeahead]="search" type="text" id="task" class="form-control" name="task" [(ngModel)]="task" required>
+            <input [ngbTypeahead]="search" type="text" id="task" class="form-control" name="task" [(ngModel)]="task"
+              [resultTemplate]="rt" [inputFormatter]="formatter" required>
 
           </div>
 
@@ -35,6 +40,12 @@
       <h3>Logged Tasks</h3>
     </div>
     <div class="card-body">
+      <div class="form-group col-md-4">
+        <select class="form-select" [(ngModel)]="selectedTaskId" (change)="filterLogs()">
+          <option value="">All Tasks</option>
+          <option *ngFor="let task of taskList" [value]="task.id">{{ task.name }}</option>
+        </select>
+      </div>
       <table class="table">
         <thead class="thead-dark">
           <tr>
@@ -45,7 +56,7 @@
         </thead>
         <tbody>
           <tr *ngFor="let log of logs">
-            <td>{{log.task}}</td>
+            <td>{{log.task?.name}}</td>
             <td>{{log.start | date: 'short'}}</td>
             <td>{{log.end}}</td>
           </tr>

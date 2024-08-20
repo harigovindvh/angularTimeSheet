@@ -1,59 +1,59 @@
-<div class="dashboard">
-    <div>
-        <p>Implement new page which allows user to enter time logs for the tasks he/she has done.</p>
-        <p>- User needs to select task (using autocomplete/typeahead preferably) and enter start and end date and
-            time.</p>
-        <p>- Bonus task (if time allows): User should be able to see the logs he/she has entered.</p><br />
+<div class="container mt-5">
+  <div class="card">
+    <div class="card-header">
+      <h3>Time Sheet</h3>
+    </div>
 
-        <p>Adding 3rd party libraries and reading documentation is allowed.</p><br />
-        <p>For time saving/convenience some libraries are preinstalled:</p>
-        CSS utility:
-        <ul>
-            <li>TailwindCSS <a target="_blank" href="https://tailwindcss.com/docs">https://tailwindcss.com/docs</a>
-            </li>
-            <li>Bootstrap 5 <a target="_blank"
-                   href="https://getbootstrap.com/docs/5.0/">https://getbootstrap.com/docs/5.0/</a></li>
-        </ul>
-        Angular UI Components:
-        <ul>
-            <li>PrimeNg <a target="_blank"
-                   href="https://www.primefaces.org/primeng/setup">https://www.primefaces.org/primeng/setup</a></li>
-            <li>NgBootstrap <a target="_blank"
-                   href="https://ng-bootstrap.github.io/#/components/accordion/api">https://ng-bootstrap.github.io/#/components/accordion/api</a>
-            </li>
-        </ul>
-        <br />
-        <p>API base url https://63d74fd85c4274b136f1fda5.mockapi.io/api/v1</p>
-        <table>
-            <thead>
-                <tr>
-                    <th>Method</th>
-                    <th>Url</th>
-                    <th>Params</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>GET</td>
-                    <td>/task</td>
-                    <td>{{'?{fieldName}={value}'}}</td>
-                </tr>
-                <tr>
-                    <td>GET</td>
-                    <td>/log</td>
-                    <td>{{'?{fieldName}={value}'}}</td>
-                </tr>
-                <tr>
-                    <td>POST</td>
-                    <td>/log</td>
-                    <td>{{'{start: any; end: any; task: any;}'}}</td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="card-body">
+      <form (ngSubmit)="onSubmit()">
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label for="task">Task</label>
+            <input [ngbTypeahead]="search" type="text" id="task" class="form-control" name="task" [(ngModel)]="task" required>
+
+          </div>
+
+          <div class="form-group col-md-4">
+            <label for="start">Start Time</label>
+            <input type="datetime-local" id="start" class="form-control" name="start" [(ngModel)]="start" required>
+          </div>
+
+          <div class="form-group col-md-4">
+            <label for="end">End Time</label>
+            <input type="datetime-local" id="end" class="form-control" name="end" [(ngModel)]="end" required>
+          </div>
+
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Save</button>
+
+      </form>
     </div>
-    <br/>
-    <div>
-        Mockup
-        <img src="assets/timesheet_wireframe.png" />
+  </div>
+
+  <div class="card mt-5">
+    <div class="card-header">
+      <h3>Logged Tasks</h3>
     </div>
+    <div class="card-body">
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th>Task</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let log of logs">
+            <td>{{log.task}}</td>
+            <td>{{log.start | date: 'short'}}</td>
+            <td>{{log.end}}</td>
+          </tr>
+        </tbody>
+
+      </table>
+    </div>
+
+  </div>
+
 </div>
